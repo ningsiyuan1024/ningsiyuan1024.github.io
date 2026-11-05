@@ -2,7 +2,7 @@
 from pathlib import Path
 from html import escape
 from html.parser import HTMLParser
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from email.utils import format_datetime
 from xml.etree import ElementTree as ET
 import json
@@ -12,6 +12,7 @@ import shutil
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / 'dist'
 CONFIG = json.loads((ROOT / 'site.json').read_text(encoding='utf-8'))
+METRICS = json.loads((ROOT / 'platform-metrics.json').read_text(encoding='utf-8'))
 BASE = CONFIG['url'].rstrip('/')
 E = escape
 
@@ -38,7 +39,8 @@ def shell(title, body, path='/', description=None, article=None):
     person = {'@type':'Person','@id':BASE+'/#author','name':'Sylan','url':BASE+'/', 'sameAs':['https://x.com/syunnng2','https://github.com/ningsiyuan1024',CONFIG['linktree']]}
     structured = {'@context':'https://schema.org', '@type':'Blog', '@id':BASE+'/#blog', 'name':'Sylan', 'url':BASE,'inLanguage':'zh-CN','author':person}
     if article:
-        structured.update({'@type':'BlogPosting','@id':BASE+path+'#article','url':BASE+path, 'headline':article['title'], 'description':description,'datePublished':article['published_at'], 'mainEntityOfPage':BASE+path, 'isBasedOn':article['source_url'],'citation':[article['source_url']]+article.get('alternate_sources',[]),'isPartOf':{'@id':BASE+'/#blog'},'image':BASE+(article.get('cover') or '/assets/avatar.png')})
+        citations = list(dict.fromkeys([article['source_url']]+article.get('alternate_sources',[])+METRICS.get('additional_sources',{}).get(article['slug'],[])))
+        structured.update({'@type':'BlogPosting','@id':BASE+path+'#article','url':BASE+path, 'headline':article['title'], 'description':description,'datePublished':article['published_at'], 'mainEntityOfPage':BASE+path, 'isBasedOn':article['source_url'],'citation':citations,'isPartOf':{'@id':BASE+'/#blog'},'image':BASE+(article.get('cover') or '/assets/avatar.png')})
     structured_json = json.dumps(structured,ensure_ascii=False).replace('<','\\u003c')
     social_image = BASE + (article.get('cover') or '/assets/avatar.png') if article else BASE + '/assets/avatar.png'
     text_alternate = f'<link rel="alternate" type="text/plain" href="{path}index.txt">' if path.endswith('/') else ''
@@ -60,6 +62,35 @@ def shell(title, body, path='/', description=None, article=None):
 def write(path, content):
     dest = OUT / path; dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(content, encoding='utf-8')
+
+def article_extras(post):
+    urls = list(dict.fromkeys([post['source_url']] + post.get('alternate_sources',[]) +
+                            METRICS.get('additional_sources',{}).get(post['slug'],[])))
+    rows = []
+    for url in urls:
+        entry = METRICS['sources'].get(url,{})
+        platform = entry.get('platform') or ('微信公众号' if 'mp.weixin.qq.com/' in url else
+                    'X' if 'x.com/' in url else '知乎' if 'zhihu.com/' in url else
+                    'B站' if 'bilibili.com/' in url else '今日头条' if 'toutiao.com/' in url else '原平台')
+        values = []
+        for metric in entry.get('metrics',[]):
+            # Preserve native names and displayed counts, including genuine zeroes.
+            if metric.get('display') is not None:
+                values.append(f'<span>{E(metric["label"])} <b>{E(str(metric["display"]))}</b></span>')
+        timestamp = entry.get('observed_at')
+        if values and not timestamp: raise ValueError('Counters require an observation time: '+url)
+        if values:
+            stamp = datetime.fromisoformat(timestamp).astimezone(timezone(timedelta(hours=8)))
+            updated = f'<time datetime="{E(timestamp,quote=True)}">{stamp:%Y.%m.%d %H:%M} UTC+8</time>'
+        else:
+            values = ['<span class="metrics-unavailable">数据暂未获取</span>']
+            updated = ''
+        rows.append(f'<li><a href="{E(url,quote=True)}">{E(platform)} ↗</a><div>{"".join(values)}</div>{updated}</li>')
+    stats = '<section class="article-metrics" aria-label="本文各平台数据"><ul>'+''.join(rows)+'</ul></section>'
+    author = CONFIG['author_footer']
+    directions = ''.join(f'<div><h3>{E(item["title"])}</h3><p>{E(item["text"])}</p></div>' for item in author['directions'])
+    bio = f'''<aside class="author-note" aria-label="关于 Sylan"><div class="author-note-head"><img src="/assets/avatar.png" width="40" height="40" alt=""><div><h2>Sylan</h2><p>{E(author['intro'])}</p></div></div><div class="author-directions">{directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></aside>'''
+    return stats + bio
 
 def build():
     # Only remove generated output inside this project.
@@ -91,7 +122,7 @@ def build():
     for i,p in enumerate(posts):
         cover = f'<img src="{E(p["cover"],quote=True)}" alt="" loading="lazy">' if p.get('cover') else '<div class="cover-type" aria-hidden="true">S<span>.</span></div>'
         cards.append(f'''<article class="entry" data-search="{E(p['title']+' '+p['text'],quote=True)}"><a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true">{cover}</a><div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span></div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
-        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span><a href="{E(p['source_url'],quote=True)}">原平台：{E(p.get('platform','原平台'))} ↗</a></div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div><div class="article-end"><a href="{E(p['source_url'],quote=True)}">阅读原平台版本 ↗</a><a href="/">返回文章列表 →</a></div></main>'''
+        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span><a href="{E(p['source_url'],quote=True)}">原平台：{E(p.get('platform','原平台'))} ↗</a></div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div>{article_extras(p)}<div class="article-end"><a href="{E(p['source_url'],quote=True)}">阅读原平台版本 ↗</a><a href="/">返回文章列表 →</a></div></main>'''
         write('articles/'+p['slug']+'/index.html',shell(p['title'],content,p['path'],p['description'],p))
         readable=ReadableText();readable.feed(p['html'])
         text_body=re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+','\n\n',''.join(readable.parts)).strip()

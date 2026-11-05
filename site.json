@@ -3,5 +3,23 @@
   "url": "https://ningsiyuan1024.github.io",
   "linktree": "https://ningsiyuan1024.github.io/sylan-linktree/",
   "description": "AI、Agent 与创造。",
-  "language": "zh-CN"
+  "language": "zh-CN",
+  "author_footer": {
+    "intro": "我是 Sylan，物理系本硕。",
+    "directions": [
+      {
+        "title": "事业",
+        "text": "在一家 To B 独角兽公司深度参与桌面办公 Agent 项目，最近关注 Harness、RSI 和主动 Agent。"
+      },
+      {
+        "title": "个人产品",
+        "text": "围绕 AI 办公与 AI 创意，整理往期合集，筹备答疑微信群（内含知识库）。Vibe Design 灵感库是其中的知识库模块。"
+      },
+      {
+        "title": "日常生活",
+        "text": "长期投入攀岩、健身和摄影。"
+      }
+    ],
+    "wechat": "NINGSiyuan1024"
+  }
 }
