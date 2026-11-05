@@ -1,0 +1,14 @@
+{
+  "slug": "wechat-2247490312-1",
+  "title": "如何找到下一个海力士？我把AI未来3年的瓶颈排了个序，这也是最值的投资的价值排序。\n\n1. 存储（HBM + DRAM + eSSD，已经涨价、签长单、利润兑现）\n2. 光互连（800G / 1.6T + Scale-Up + Scale-Across，连接接棒算力）\n3. 先进封装（CoWoS + CoPoS + HBM封装，HBM和GPU放量的前提）\n4. ASIC + Networking（自研芯片、交换芯片、SerDes、DSP，MRVL/AVGO核心位置）\n5. 电力 / AI Factory（变压器、电网、UPS、800V DC、BBU，并网容量是真瓶颈）\n6. 液冷（DLC、CDU、冷板，高功率机柜必选项）\n7. 核能 / 发电（长期空间巨大，但兑现节奏慢于电力设备）\n8. PCB / ABF / CCL（AI服务器和先进封装配套材料，真实受益但控制力弱于前面）\n9. MLCC / 被动元件（高频高压高功率带来用量提升，属于配套瓶颈）\n10. 半导体设备（检测、量测、测试、先进封装设备，卖水给淘金者）\n11. Physical AI（机器人、自动驾驶、工业AI，空间大但2026仍偏预期）\n12. Agent / 数据层（方向确定，但赢家和利润分配还不清晰）\n13. 稳定币 / AI金融（AI Agent支付层，空间大但商业化还早）\n\n目前最看好的，还是存储第一，光互连第二，先进封装第三。因为AI发展到最后，拼的是谁真正卡住了整个产业链的命脉。",
+  "published_at": "2026-06-22",
+  "source_url": "https://mp.weixin.qq.com/s/QJs0jBd6M5NO-iMC1EiD_w",
+  "platform": "微信公众号",
+  "status": "published_verified",
+  "cover": null,
+  "source_html_sha256": "4b313a0cd378bee8557d90eab51ec77386743ce4d5e7b7252de95e941e098180",
+  "body_sha256": "54d2bac3276a60256be5c4d23f9beeaf2909b8894bbbea01b3b4f5a8f2f2386b",
+  "text_preserved": true,
+  "asset_count": 0,
+  "warnings": []
+}

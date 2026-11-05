@@ -1,0 +1,14 @@
+{
+  "slug": "wechat-2247491214-1",
+  "title": "最近用 Opus 和 Astra 写了不少 UI，发现一个避免 AI slop 并且让界面更好看的秘诀：\n\n在 AGENTS.md 里加上 “Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.”",
+  "published_at": "2026-11-02",
+  "source_url": "https://mp.weixin.qq.com/s/f_2ZZ7wy6pUhok9nlVvt3A",
+  "platform": "微信公众号",
+  "status": "published_verified",
+  "cover": null,
+  "source_html_sha256": "ae6d56e24a9454f3d3f963e3a5dd6daf48c42d9381966a41142c137f13aa6eae",
+  "body_sha256": "adac10f2d649eaa53ae8208b36ee93578d6eeb64a6617854ab165fc0232b7c10",
+  "text_preserved": true,
+  "asset_count": 0,
+  "warnings": []
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "wechat-2247489405-1",
+  "title": "这次 GPT 在生图提示词上做的是减法。\n\n不再依赖于提示词技巧，而是靠风格信息是否准确。\n\nNano Bananna 2时代的提示词写法，需要把一堆元素进行架构。看起来很复杂，实际上很多内容并不真正起作用，但由于生图的抽卡随机性，我们不得不长篇累牍来确保稳定性。\n\nGPT-image2降低了用户在“编提示词”这件事上的消耗，把更多发挥空间交给模型本身的推理能力。\n\n也就是说，直接告诉它：\n\n“你要什么风格”\n“你要什么内容”\n\n剩下的，交给 AI。\n\n例如如何用Nano banana 2 拆解你喜欢的写真：建立自己的时尚档案的提示词可能有1000字才能保证稳定的效果。\n\n但对于GPT-imgae-2：\n\n基于上传的人物照片，对妆造进行系统拆解，生成一张Vogue / Numéro 式的「服饰解构与风格档案」信息图，主标题为具体风格名称。\n\n足够了。",
+  "published_at": "2026-04-22",
+  "source_url": "https://mp.weixin.qq.com/s/bb5RGoF2wXVQmpLnxGcp0g",
+  "platform": "微信公众号",
+  "status": "published_verified",
+  "cover": null,
+  "source_html_sha256": "ba5d6bc6496807034edf48f0ffcf69a2ba2e8756c88f68cd8d78f5c4302bec97",
+  "body_sha256": "484c06c307f7999e5216e2d84323deadedcb8a40583759f9bac94a1e24016f96",
+  "text_preserved": true,
+  "asset_count": 0,
+  "warnings": []
+}

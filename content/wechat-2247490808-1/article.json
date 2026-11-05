@@ -1,0 +1,14 @@
+{
+  "slug": "wechat-2247490808-1",
+  "title": "Qwen-Image-2.1开源了，7B的参数GPT- image-2级别的效果。这里是你需要知道的一切：\n\n1. 轻量且低门槛（7B 参数）： 采用轻量化 7B 架构，推理速度快，多图输入时延迟低，适合本地或中低配 GPU 部署。\n\n这个帖子专门用来存放 Qwen Image 2.1 生成的图片。\n\n2.原生透明通道（RGBA）： 原生支持生成和修改透明背景图层，方便免扣图合成、平面设计及文字排版。\n\n3. 多图参考能力： 最多支持同时传入 10 张参考图，能够精准保持人物五官或产品外观的一致性（例如给出角色的三视图直接生成连续分镜脚本）。\n\n4. 精准局部编辑： 支持用圈选（如红/蓝/绿圈标记区域）等方式，对画面的不同局部同时下达多条修改指令。\n\n5.特定优化的应用场景： 针对全景图、信息图表排版、文字渲染（Typography）以及虚拟试衣等常见设计需求做了专门优化。",
+  "published_at": "2026-09-21",
+  "source_url": "https://mp.weixin.qq.com/s/yo-gpV3nEtQDLcn9cSfPzA",
+  "platform": "微信公众号",
+  "status": "published_verified",
+  "cover": null,
+  "source_html_sha256": "f0679eca601dce1732667e00fa3b9f8918162597eb998eaaae91c7e6065dc9dd",
+  "body_sha256": "b140be9c7703c710ee8c91391008cf2fcc7f28ac41e72a504aceb4f49e2deaa8",
+  "text_preserved": true,
+  "asset_count": 0,
+  "warnings": []
+}
