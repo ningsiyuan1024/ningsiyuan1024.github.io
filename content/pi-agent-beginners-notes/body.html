@@ -1,0 +1,31 @@
+<div><div><div><div><div><div style="color:rgb(15, 20, 25)"><h1><div><span><span>1. Agent Loop 的运作</span></span></div></h1></div><div style="color:rgb(15, 20, 25)"><h2><div><span><span>Trace 与 Turn：</span></span></div></h2></div><ul><li><div><span style="font-weight:bold"><span>Trace：</span></span><span><span>这里用它表示从用户输入一个问题，到 Agent 完成本次处理并最终答复的完整过程。这是便于理解的过程划分，不表示 Pi 会话文件里存在一层同名的树节点。</span></span></div></li><li><div><span style="font-weight:bold"><span>Turn：</span></span><span><span>一次 LLM 响应，加上这次响应触发的工具调用与工具结果。每个 Turn 可以拆成模型调用、工具执行两个环节，其中工具执行是可选的。</span></span></div></li></ul><div><div><span><span>举例来说：</span></span></div></div><section><div><div><div><div><div><a href="https://x.com/syunnng2/article/2113555430664483207/media/2113544478325919744" rel="noopener noreferrer"><div style="background-color:rgb(117, 54, 54)"><div></div><div></div></div></a></div></div></div></div></div></section><div><div><span><span>Session
+└─ Trace（一次任务的概念示意）
+   ├─ Turn 1
+   │  ├─ Assistant Message
+   │  ├─ Tool Call
+   │  └─ Tool Result
+   ├─ Turn 2
+   └─ Turn 3</span></span></div></div><div style="color:rgb(15, 20, 25)"><h1><div><span><span>2. Context Engineering</span></span></div></h1></div><div style="color:rgb(15, 20, 25)"><h2><div><span><span>基本上下文组件：</span></span></div></h2></div><ul><li><div><span><span>systemPrompt</span></span></div></li><li><div><span><span>messages</span></span></div></li><li><div><span><span>tool schemas</span></span></div></li></ul><div style="color:rgb(15, 20, 25)"><h2><div><span><span>2.1 Session</span></span></div></h2></div><div><div><span><span>Pi 里的 Session 使用 JSONL 保存完整历史，并通过 id 和 parentId 构成一棵树，但是不会全部发送给模型。</span></span></div></div><div><div><span><span>例如：</span></span></div></div><div><div><span><span>A — B — C
+ \
+  D — E</span></span></div></div><div><div><span><span>用户通过 /tree 从 C 切换到 E 时，Pi 可以对离开的分支进行总结：</span></span></div></div><div><div><span><span>分支 B-C 尝试了方案一：
+- 修改了 parser.ts
+- 测试失败
+- 失败原因是……</span></span></div></div><div><div><span><span>然后将这个 Branch Summary 注入目标分支。</span></span></div></div><div><div><span><span>流程包括：</span></span></div></div><ol><li><div><span><span>找到两个分支的共同祖先；</span></span></div></li><li><div><span><span>收集离开分支上的消息；</span></span></div></li><li><div><span><span>生成摘要；</span></span></div></li><li><div><span><span>在目标位置加入 BranchSummaryEntry。</span></span></div></li></ol><div><div><span><span>这样切换分支后，模型不会完全忘记另一个分支上得到的结论。</span></span></div></div><div style="color:rgb(15, 20, 25)"><h2><div><span><span>2.2 Turn</span></span></div></h2></div><div><div><span><span>每个 Turn 发起模型调用前，Pi 可以通过 transformContext 动态变换上下文，再通过 convertToLlm 转成模型兼容格式。</span></span></div></div><div><div><span><span>AgentMessage[]
+    ↓
+transformContext
+    ↓
+convertToLlm
+    ↓
+Message[]
+    ↓
+Provider Payload</span></span></div></div><ul><li><div><span><span>transformContext：在 Agent Message 层处理上下文</span></span></div></li><li><div><span><span>convertToLlm：transformContext 之后，Pi 再使用 convertToLlm 把内部消息转换为模型兼容格式</span></span></div></li></ul><div><div><span><span>同一次用户输入引出的任务特别长时：</span></span></div></div><div><div><span><span>即使没有新的 User Message，Agent 也可能连续经历多个 Turn，并执行大量工具。这整段消息跨度可能超过保留预算。</span></span></div></div><div><div><span><span>Pi 允许在这段跨度内部、Assistant Message 所在的位置切分。这种情况下，会分别总结：</span></span></div></div><ul><li><div><span><span>更早的历史</span></span></div></li><li><div><span><span>当前这段长任务中、切分点之前的消息</span></span></div></li></ul><div><div><span><span>*不能在 Tool Result 切分。因为 Tool Result 和 Tool Call 必须保持一致。</span></span></div></div><div><div><span><span>2.3 Compaction 上下文压缩</span></span></div></div><div><div><span><span>本质是将长对话压缩成一个任务快照。</span></span></div></div><div><div><span><span>压缩流程：</span></span></div></div><ol><li><div><span><span>判断是否达到自动压缩阈值：contextTokens &gt; contextWindow - reserveTokens。</span></span></div></li><li><div><span><span>从最新消息向前计算需要保留的上下文，按 keepRecentTokens 预算寻找切分点。</span></span></div></li><li><div><span><span>选择较旧消息作为待总结内容</span></span></div></li><li><div><span><span>调用 LLM 生成结构化摘要</span></span></div></li><li><div><span><span>保存 CompactionEntry</span></span></div></li><li><div><span><span>重新构建 Context</span></span></div></li><li><div><span><span>用摘要＋最近消息继续工作</span></span></div></li></ol><div><div><span><span>压缩前：</span></span></div></div><div><div><span><span>System Prompt
+消息 1
+消息 2
+消息 3
+...
+消息 100</span></span></div></div><div><div><span><span>压缩后：</span></span></div></div><div><div><span><span>System Prompt
+历史摘要
+消息 81
+消息 82
+...
+消息 100</span></span></div></div><div><div><span><span>模型最终看到的：</span></span></div></div><ul><li><div><span><span>System Prompt</span></span></div></li><li><div><span><span>历史摘要</span></span></div></li><li><div><span><span>最近消息</span></span></div></li><li><div><span><span>最近工具结果</span></span></div></li></ul><div style="color:rgb(15, 20, 25)"><h1><div><span><span>3. Tool-Calling</span></span></div></h1></div><ol><li><div><span><span>Tool Schema</span></span></div></li><li><div><span><span>Tools</span></span></div></li></ol><div style="color:rgb(15, 20, 25)"><h2><div><span><span>3.1 延迟加载工具设计</span></span></div></h2></div><div><div><span><span>工具定义的延迟加载取决于所用的 Pi 版本、Provider 及模型接口支持。可以按这个思路理解两类工具定义：</span></span></div></div><ul><li><div><span><span>immediate tools：立即发送完整定义</span></span></div></li><li><div><span><span>deferred tools：延迟加载或通过工具引用暴露</span></span></div></li></ul><div><div><span><span>大致思路类似 skills 的渐进式加载：</span></span></div></div><div><div><span><span>先提供少量核心工具 → 模型需要特殊工具 → 再加载特殊工具。具体调用方式需要对照所用的 Pi 版本和 Provider，不能假设所有模型接口都采用相同机制。</span></span></div></div><div style="color:rgb(15, 20, 25)"><h2><div><span><span>3.2 注意事项</span></span></div></h2></div><ol><li><div><span><span>只靠 prompt 无法保证安全，真正的安全边界必须在 runtime。</span></span></div></li></ol><div><div><span><span>比如：参数校验、路径限制、命令 allowlist / denylist、系统权限、沙箱</span></span></div></div><div><div><span><span>2. 控制工具输出大小</span></span></div></div><ul><li><div><span><span>截断长输出</span></span></div></li><li><div><span><span>将完整输出保存到文件，返回摘要或关键内容。</span></span></div></li><li><div><span><span>提供关键行号</span></span></div></li><li><div><span><span>保留可继续读取的路径</span></span></div></li></ul></div></div></div></div></div>
