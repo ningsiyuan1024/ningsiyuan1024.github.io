@@ -127,10 +127,14 @@ def build():
         readable=ReadableText();readable.feed(p['html'])
         text_body=re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+','\n\n',''.join(readable.parts)).strip()
         write('articles/'+p['slug']+'/index.txt',f"{p['title']}\n\n作者：Sylan\n原发表日期：{p['published_at']}\n博客地址：{BASE}{p['path']}\n原平台：{p['source_url']}\n\n{text_body}\n")
-    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section><section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
+    author = CONFIG['author_footer']
+    home_directions = ''.join(f'<div><h2>{E(item["title"])}</h2><p>{E(item["text"])}</p></div>' for item in author['directions'])
+    about = f'''<section class="home-about" aria-label="作者介绍"><div class="author-directions">{home_directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></section>'''
+    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
     write('index.html',shell('个人博客',body))
     listing='\n'.join(f"- [{p['title']}]({BASE}{p['path']}): {p['published_at']} · 原平台 {p['source_url']} · [全文文本]({BASE}{p['path']}index.txt)" for p in posts)
-    write('index.txt',f'Sylan\n\n{CONFIG["description"]}\n\n{listing}\n')
+    author_text = author['intro']+'\n\n'+'\n\n'.join(item['title']+'\n'+item['text'] for item in author['directions'])+'\n\n微信：'+author['wechat']
+    write('index.txt',f'Sylan\n\n{CONFIG["description"]}\n\n{author_text}\n\n{listing}\n')
     write('llms.txt',f'# Sylan\n\n> Sylan 已公开发表文章的个人博客。\n\n## 作者与来源\n\n- [X](https://x.com/syunnng2)\n- [GitHub](https://github.com/ningsiyuan1024)\n- [Linktree]({CONFIG["linktree"]})\n\n文章保留原发表日期与原平台来源。译文、节选和引用的原始作者信息见各篇正文。\n\n## 文章\n\n{listing}\n\n## 订阅与目录\n\n- [RSS]({BASE}/feed.xml)\n- [站点地图]({BASE}/sitemap.xml)\n')
     write('404.html',shell('页面未找到','<main id="main" class="article-page"><h1>页面未找到</h1><a href="/">返回文章列表 →</a></main>','/404.html'))
     write('.nojekyll','')
