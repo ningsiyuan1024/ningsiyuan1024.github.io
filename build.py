@@ -53,6 +53,7 @@ def shell(title, body, path='/', description=None, article=None):
 <meta property="og:type" content="{'article' if article else 'website'}"><meta property="og:title" content="{E(title, quote=True)}">
 <meta property="og:description" content="{E(description, quote=True)}"><meta property="og:url" content="{BASE}{path}">
 <meta property="og:image" content="{social_image}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{E(title, quote=True)}"><meta name="twitter:description" content="{E(description, quote=True)}"><meta name="twitter:image" content="{social_image}"><link rel="stylesheet" href="/assets/style.css">
+<style>.archive-tools{{display:flex;align-items:center;gap:16px}}.archive-tools select{{background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:6px 8px;font:12px inherit}}.topic{{color:var(--accent)}}@media(max-width:700px){{.archive-tools{{gap:5px}}.archive-tools select{{max-width:108px}}}}</style>
 <script type="application/ld+json">{structured_json}</script></head>
 <body><a class="skip" href="#main">跳到正文</a><header class="masthead"><a class="brand" href="/">Sylan<span>.</span></a>
 <nav aria-label="主导航"><a href="/">文章</a><a href="{CONFIG['linktree']}">Linktree ↗</a><a href="/feed.xml">RSS</a></nav></header>
@@ -114,15 +115,20 @@ def build():
         p['description'] = p['text'][:130] or p['title']
         p['minutes'] = max(1, round(len(p['text']) / 400))
         p['path'] = '/articles/' + p['slug'] + '/'
+        p['categories'] = p.get('categories', [])
+        if not isinstance(p['categories'], list) or any(not isinstance(c, str) or not c.strip() for c in p['categories']):
+            raise ValueError(f'Invalid categories: {path}')
         posts.append(p)
         if (path.parent / 'assets').exists(): shutil.copytree(path.parent / 'assets', OUT / 'articles' / p['slug'] / 'assets')
     posts.sort(key=lambda p:(p['published_at'],p['slug']), reverse=True)
     if len({p['slug'] for p in posts}) != len(posts): raise ValueError('Duplicate slugs')
     cards = []
+    categories = sorted({c for p in posts for c in p['categories']})
     for i,p in enumerate(posts):
         cover = f'<img src="{E(p["cover"],quote=True)}" alt="" loading="lazy">' if p.get('cover') else '<div class="cover-type" aria-hidden="true">S<span>.</span></div>'
-        cards.append(f'''<article class="entry" data-search="{E(p['title']+' '+p['text'],quote=True)}"><a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true">{cover}</a><div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span></div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
-        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span><a href="{E(p['source_url'],quote=True)}">原平台：{E(p.get('platform','原平台'))} ↗</a></div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div>{article_extras(p)}<div class="article-end"><a href="{E(p['source_url'],quote=True)}">阅读原平台版本 ↗</a><a href="/">返回文章列表 →</a></div></main>'''
+        labels = ''.join(f'<span class="topic">{E(c)}</span>' for c in p['categories'])
+        cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}"><a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true">{cover}</a><div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
+        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span>{labels}<a href="{E(p['source_url'],quote=True)}">原平台：{E(p.get('platform','原平台'))} ↗</a></div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div>{article_extras(p)}<div class="article-end"><a href="{E(p['source_url'],quote=True)}">阅读原平台版本 ↗</a><a href="/">返回文章列表 →</a></div></main>'''
         write('articles/'+p['slug']+'/index.html',shell(p['title'],content,p['path'],p['description'],p))
         readable=ReadableText();readable.feed(p['html'])
         text_body=re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+','\n\n',''.join(readable.parts)).strip()
@@ -130,7 +136,8 @@ def build():
     author = CONFIG['author_footer']
     home_directions = ''.join(f'<div><h2>{E(item["title"])}</h2><p>{E(item["text"])}</p></div>' for item in author['directions'])
     about = f'''<section class="home-about" aria-label="作者介绍"><div class="author-directions">{home_directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></section>'''
-    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
+    topic_options = ''.join(f'<option value="{E(c,quote=True)}">{E(c)}</option>' for c in categories)
+    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
     write('index.html',shell('个人博客',body))
     listing='\n'.join(f"- [{p['title']}]({BASE}{p['path']}): {p['published_at']} · 原平台 {p['source_url']} · [全文文本]({BASE}{p['path']}index.txt)" for p in posts)
     author_text = author['intro']+'\n\n'+'\n\n'.join(item['title']+'\n'+item['text'] for item in author['directions'])+'\n\n微信：'+author['wechat']

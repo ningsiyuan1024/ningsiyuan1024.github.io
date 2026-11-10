@@ -86,6 +86,10 @@ def run(path):
     cover=cleaner.media(src['cover_url']) if src.get('cover_url') else next((x['path'] for x in cleaner.assets.values()),None)
     # Explicit public metadata only: no account tokens, local paths or raw browser snapshots.
     metadata={k:src[k] for k in ('slug','title','published_at','source_url','platform','status') if k in src}
+    if 'categories' in src:
+        if not isinstance(src['categories'], list) or any(not isinstance(c, str) or not c.strip() for c in src['categories']):
+            raise ValueError('Invalid categories')
+        metadata['categories']=src['categories']
     metadata.update({'cover':cover,'source_html_sha256':hashlib.sha256(src['html'].encode()).hexdigest(),'body_sha256':hashlib.sha256(body.encode()).hexdigest(),'text_preserved':True,'asset_count':len(cleaner.assets),'warnings':sorted(set(cleaner.warnings))})
     (folder/'body.html').write_bytes(body.encode('utf-8'))
     (folder/'article.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
