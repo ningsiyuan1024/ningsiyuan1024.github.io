@@ -1,17 +1,22 @@
 {
   "slug": "ai-infra-learning-route",
-  "title": "AI Infra 学习路线学习笔记",
+  "title": "AI infra 学习路线图",
   "published_at": "2026-11-14T13:21:42Z",
-  "source_url": "https://x.com/syunnng2/article/2121594424547524727",
+  "source_url": "https://x.com/syunnng2/article/2122200912236278032",
   "platform": "X Articles",
   "status": "published_verified",
   "categories": [
     "技术文章"
   ],
-  "cover": null,
-  "source_html_sha256": "dbd042331c01ceb9bb3279cbee89569dd9e27908889a708eaaeb8e5f622f08bc",
-  "body_sha256": "7bc9950a9c9b3e8a887c74c35605cb3e1f14dca78983be84941f94c83f05cbdc",
+  "cover": "/articles/ai-infra-learning-route/assets/cover-late-timeline.jpg",
+  "source_html_sha256": "e55df4e9500ec0765e78c51c9d2046a3043a9c97de6f197aac189d346de499e6",
+  "body_sha256": "d56b4ff31e7ebe83a83038fc75a5d9ba9f7787edaa9762527c93e29f054940ac",
   "text_preserved": true,
-  "asset_count": 0,
-  "warnings": []
+  "asset_count": 1,
+  "warnings": [],
+  "updated_at": "2026-11-16T05:31:40.000Z",
+  "body_format_provenance": "Canonical semantic headings and9 native tables;all text and URLs verified against published X article;existing approved cover reused.",
+  "alternate_sources": [
+    "https://x.com/syunnng2/article/2121594424547524727"
+  ]
 }

@@ -1,8 +1,10 @@
+<figure><img src="/articles/ai-infra-learning-route/assets/cover-late-timeline.jpg" alt="Speculative Decoding 发展时间线" style="display:block;width:100%;height:auto" /></figure>
 <p><b>模型成了 LLM 时代的操作系统，AI Infra 成了 LLM 时代的计算机体系结构。</b></p>
 <p>AI Infra（人工智能基础设施）是大模型时代壁垒最高、最核心的技术高地。本文从前置基础到推理部署，系统梳理 AI Infra 的完整学习路线，为每个模块列出需要掌握的知识点、推荐学习资料以及可量化的检验标准，帮助从业者建立体系化的知识树。</p>
+<p>我把文中的课程、教程和论文整理到了 GitHub 的 <a href="https://github.com/ningsiyuan1024/ai-infra-learning-resources">Agent 开发学习路径</a> 中，作为 AI Infra 部分，方便集中查找课程、作业和官方文档。</p>
 <p><strong>目录</strong></p>
-<p><strong>1. 全景概览：三层架构</strong><br><strong>2. 第零层：前置知识</strong><br>　2.1 知识点<br>　2.2 推荐资料<br>　2.3 检验标准<br><strong>3. 第一层：CUDA 编程与算子优化</strong><br>　3.1 知识点<br>　3.2 推荐资料<br>　3.3 检验标准<br><strong>4. 第二层：分布式训练</strong><br>　4.1 知识点<br>　4.2 推荐资料<br>　4.3 检验标准<br><strong>5. 第三层：推理与部署</strong><br>　5.1 LLM 推理基础<br>　5.2 推理引擎<br>　5.3 量化<br>　5.4 Speculative Decoding<br>　5.5 性能分析工具<br>　5.6 推荐资料<br><strong>6. 新人破局指南</strong><br>　6.1 推荐学习路径<br>　6.2 核心权衡思维<br><strong>7. 核心参考论文</strong></p>
-<hr>
+<p><strong>1. 全景概览：三层架构</strong><br><strong>2. 第零层：前置知识</strong><br>　2.1 知识点<br>　2.2 推荐资料<br>　2.3 检验标准<br><strong>3. 第一层：CUDA 编程与算子优化</strong><br>　3.1 知识点<br>　3.2 推荐资料<br>　3.3 检验标准<br><strong>4. 第二层：分布式训练</strong><br>　4.1 知识点<br>　4.2 推荐资料<br>　4.3 检验标准<br><strong>5. 第三层：推理与部署</strong><br>　5.1 LLM 推理基础<br>　5.2 推理引擎<br>　5.3 量化<br>　5.4 Speculative Decoding<br>　5.5 性能分析工具<br>　5.6 推荐资料<br><strong>6. 学习建议</strong><br>　6.1 推荐学习路径<br>　6.2 核心权衡思维<br><strong>7. 推荐资源</strong><br>　7.1 核心参考论文<br>　7.2 优质开源课程</p>
+<hr />
 <h2>1. 全景概览：三层架构</h2>
 <p>AI Infra 的本质是 <b>&quot;用系统工程释放硬件算力&quot;</b>。自底向上分为三个核心层级加一个前置知识层：</p>
 <table>
@@ -37,7 +39,7 @@
 </tbody>
 </table>
 <p>所有的优化都是在 <b>&quot;计算、通信、显存&quot;</b> 这个不可能三角中做取舍：ZeRO 是用通信换显存；重计算（Activation Checkpointing）是用计算换显存；量化是用精度换显存和带宽。学习时始终问自己：<b>这个技术牺牲了什么，换取了什么？</b></p>
-<hr>
+<hr />
 <h2>2. 第零层：前置知识</h2>
 <h3>2.1 知识点</h3>
 <h4>编程语言</h4>
@@ -68,32 +70,12 @@
 <li>基本调试：<b><code>torch.cuda.memory_summary()</code></b>、<b><code>torch.profiler</code></b></li>
 </ul>
 <h4>通信拓扑</h4>
-<table>
-<thead>
-<tr>
-<th>范围</th>
-<th>需掌握内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>单机内部</td>
-<td>NVLink / NVSwitch 带宽与拓扑</td>
-</tr>
-<tr>
-<td>多机间</td>
-<td>InfiniBand（IB）网络、RoCE 协议</td>
-</tr>
-<tr>
-<td>集合通信原语</td>
-<td>AllReduce、AllGather、ReduceScatter 的含义与通信量公式</td>
-</tr>
-<tr>
-<td>NCCL</td>
-<td>NVIDIA 集合通信库的基本用法</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>单机内部</strong>：NVLink / NVSwitch 带宽与拓扑</li>
+<li><strong>多机间</strong>：InfiniBand（IB）网络、RoCE 协议</li>
+<li><strong>集合通信原语</strong>：AllReduce、AllGather、ReduceScatter 的含义与通信量公式</li>
+<li><strong>NCCL</strong>：NVIDIA 集合通信库的基本用法</li>
+</ul>
 <h3>2.2 推荐资料</h3>
 <table>
 <thead>
@@ -106,54 +88,34 @@
 <tbody>
 <tr>
 <td>数学直觉</td>
-<td><a href="https://www.3blue1brown.com/?topic=linear-algebra" rel="noopener noreferrer">3Blue1Brown：线性代数</a></td>
+<td><a href="https://www.3blue1brown.com/?topic=linear-algebra">3Blue1Brown：线性代数</a></td>
 <td>通过可视化理解向量、线性变换与矩阵，作为数学预热。</td>
 </tr>
 <tr>
 <td>框架入门</td>
-<td><a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html" rel="noopener noreferrer">PyTorch Learn the Basics</a></td>
+<td><a href="https://docs.pytorch.org/tutorials/beginner/basics/intro.html">PyTorch Learn the Basics</a></td>
 <td>官方循序教程，覆盖 Tensor、DataLoader、模型、autograd、优化与保存；含可运行笔记本，2026 年 1 月更新。</td>
 </tr>
 <tr>
 <td>完整主线</td>
-<td><a href="https://cs336.stanford.edu/" rel="noopener noreferrer">Stanford CS336：Language Modeling from Scratch（Spring 2026）</a></td>
+<td><a href="https://cs336.stanford.edu/">Stanford CS336：Language Modeling from Scratch（Spring 2026）</a></td>
 <td>英文进阶课程，含讲义、录播、作业与代码；从 tokenizer、模型和优化器延伸到系统优化、分布式训练、数据、scaling 与 RL。部分作业需要 GPU。</td>
 </tr>
 <tr>
 <td>集合通信</td>
-<td><a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/index.html" rel="noopener noreferrer">NVIDIA NCCL User Guide（2.32.3）</a></td>
+<td><a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/index.html">NVIDIA NCCL User Guide（2.32.3）</a></td>
 <td>官方通信库文档，查阅 communicator、AllReduce、AllGather、ReduceScatter 等原语的用法。</td>
 </tr>
 </tbody>
 </table>
 <h3>2.3 检验标准</h3>
-<table>
-<thead>
-<tr>
-<th>检验项目</th>
-<th>达标标准</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Transformer 白板默写</td>
-<td>不看资料，能画出一个 Decoder Block 完整结构，标注每步输入输出维度</td>
-</tr>
-<tr>
-<td>维度推导</td>
-<td>给定 7B 模型配置（hidden_dim=4096, num_heads=32, num_layers=32, vocab_size=32000），能手算总参数量（误差 ≤20%）</td>
-</tr>
-<tr>
-<td>PyTorch 训练脚本</td>
-<td>能独立写出完整训练循环（含 DataLoader、forward、loss、backward、optimizer step、checkpoint），在 GPU 上跑通</td>
-</tr>
-<tr>
-<td>Linux 日常</td>
-<td>SSH 登录、tmux、conda/pip 管理、nvidia-smi、git、bash 脚本</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<ul>
+<li><strong>Transformer 白板默写</strong>：不看资料，能画出一个 Decoder Block 完整结构，标注每步输入输出维度</li>
+<li><strong>维度推导</strong>：给定 7B 模型配置（hidden_dim=4096, num_heads=32, num_layers=32, vocab_size=32000），能手算总参数量（误差 ≤20%）</li>
+<li><strong>PyTorch 训练脚本</strong>：能独立写出完整训练循环（含 DataLoader、forward、loss、backward、optimizer step、checkpoint），在 GPU 上跑通</li>
+<li><strong>Linux 日常</strong>：SSH 登录、tmux、conda/pip 管理、nvidia-smi、git、bash 脚本</li>
+</ul>
+<hr />
 <h2>3. 第一层：CUDA 编程与算子优化</h2>
 <h3>3.1 知识点</h3>
 <h4>GPU 硬件架构</h4>
@@ -201,68 +163,45 @@
 <tbody>
 <tr>
 <td>CUDA 基础</td>
-<td><a href="https://docs.nvidia.com/cuda/cuda-programming-guide/" rel="noopener noreferrer">CUDA Programming Guide</a></td>
+<td><a href="https://docs.nvidia.com/cuda/cuda-programming-guide/">CUDA Programming Guide</a></td>
 <td>NVIDIA 官方学习主线，涵盖编程模型、CUDA C++/Python、基础与进阶主题。</td>
 </tr>
 <tr>
 <td>系统实作</td>
-<td><a href="https://github.com/stanford-cs336/assignment2-systems" rel="noopener noreferrer">Stanford CS336 Assignment 2：Systems</a></td>
+<td><a href="https://github.com/stanford-cs336/assignment2-systems">Stanford CS336 Assignment 2：Systems</a></td>
 <td>练习性能分析与基准测试，用 Triton 实现 FlashAttention 2，并构建内存高效的分布式训练；进阶作业。</td>
 </tr>
 <tr>
 <td>Triton</td>
-<td><a href="https://triton-lang.org/main/getting-started/tutorials/" rel="noopener noreferrer">Triton Tutorials</a></td>
+<td><a href="https://triton-lang.org/main/getting-started/tutorials/">Triton Tutorials</a></td>
 <td>官方按难度排序的代码教程，从向量加法、矩阵乘法到 fused attention。</td>
 </tr>
 <tr>
 <td>CUDA C++ / GEMM</td>
-<td><a href="https://docs.nvidia.com/cutlass/latest/media/docs/operators/tutorials/index.html" rel="noopener noreferrer">CUTLASS Operator Tutorials（4.8.1）</a></td>
+<td><a href="https://docs.nvidia.com/cutlass/latest/media/docs/operators/tutorials/index.html">CUTLASS Operator Tutorials（4.8.1）</a></td>
 <td>NVIDIA 引导式 notebook，练习基础 GEMM、融合 epilogue、自定义 kernel 与 block-scaled GEMM。</td>
 </tr>
 <tr>
 <td>PyTorch 算子</td>
-<td><a href="https://docs.pytorch.org/tutorials/intermediate/transformer_building_blocks.html" rel="noopener noreferrer">Transformer Building Blocks</a></td>
+<td><a href="https://docs.pytorch.org/tutorials/intermediate/transformer_building_blocks.html">Transformer Building Blocks</a></td>
 <td>可运行教程，讲解 SDPA、Nested Tensors、<code>torch.compile</code> 与 FlexAttention；要求 PyTorch 2.6 或更新版本。</td>
 </tr>
 <tr>
 <td>性能分析</td>
-<td><a href="https://docs.nvidia.com/nsight-systems/UserGuide/" rel="noopener noreferrer">Nsight Systems User Guide</a> 与 <a href="https://docs.nvidia.com/nsight-compute/ComputeTriage/" rel="noopener noreferrer">Nsight Compute Compute Triage Guide</a></td>
+<td><a href="https://docs.nvidia.com/nsight-systems/UserGuide/">Nsight Systems User Guide</a> 与 <a href="https://docs.nvidia.com/nsight-compute/ComputeTriage/">Nsight Compute Compute Triage Guide</a></td>
 <td>先用系统时间线定位关键路径，再做 kernel 级诊断；Compute Triage 提供由上而下的排查流程。</td>
 </tr>
 </tbody>
 </table>
 <h3>3.3 检验标准</h3>
-<table>
-<thead>
-<tr>
-<th>检验项目</th>
-<th>达标标准</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>硬件参数直觉</td>
-<td>拿到 H100，不查资料能说出 HBM 容量（80GB）、带宽（~3.35TB/s）的量级</td>
-</tr>
-<tr>
-<td>Reduce 三连</td>
-<td>从全局内存原子加 → 共享内存+树形归约 → Warp Shuffle，三版本跑 Nsight Compute 对比</td>
-</tr>
-<tr>
-<td>GEMM 分块</td>
-<td>实现基于 Shared Memory Tiling 的 GEMM kernel，达到 cuBLAS 50% 以上性能</td>
-</tr>
-<tr>
-<td>FlashAttention 白板推导</td>
-<td>能在白板上画出 tiling 过程，说清为什么 HBM 读写从 <code>O(N²)</code> 降到 <code>O(N)</code></td>
-</tr>
-<tr>
-<td>Profiling 实战</td>
-<td>用 Nsight Systems 定位 GPU idle gap 来源；用 Nsight Compute 判断 kernel 是 memory bound 还是 compute bound</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<ul>
+<li><strong>硬件参数直觉</strong>：拿到 H100，不查资料能说出 HBM 容量（80GB）、带宽（~3.35TB/s）的量级</li>
+<li><strong>Reduce 三连</strong>：从全局内存原子加 → 共享内存+树形归约 → Warp Shuffle，三版本跑 Nsight Compute 对比</li>
+<li><strong>GEMM 分块</strong>：实现基于 Shared Memory Tiling 的 GEMM kernel，达到 cuBLAS 50% 以上性能</li>
+<li><strong>FlashAttention 白板推导</strong>：能在白板上画出 tiling 过程，说清为什么 HBM 读写从 <code>O(N²)</code> 降到 <code>O(N)</code></li>
+<li><strong>Profiling 实战</strong>：用 Nsight Systems 定位 GPU idle gap 来源；用 Nsight Compute 判断 kernel 是 memory bound 还是 compute bound</li>
+</ul>
+<hr />
 <h2>4. 第二层：分布式训练</h2>
 <p>打个比方，训练千亿参数大模型就像<b>抄写一本数万页的百科全书</b>——数据并行是把同一本书复印多份、每人抄不同章节内容然后汇总；张量并行是把每一页拆成几列、每人只抄自己那几列；流水线并行则是第一个人抄完第一章就传给第二人继续。</p>
 <h3>4.1 知识点</h3>
@@ -272,71 +211,23 @@
 <li><b>优化器状态的显存开销</b>：以 AdamW + 混合精度为例，每个参数额外需要 FP32 参数副本（4B）+ 一阶动量（4B）+ 二阶动量（4B）= 12字节/参数。7B 模型的优化器状态就要占 ~84GB</li>
 </ul>
 <h4>数据并行</h4>
-<table>
-<thead>
-<tr>
-<th>技术</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>DDP（DistributedDataParallel）</td>
-<td>多进程数据并行，理解 AllReduce 梯度同步</td>
-</tr>
-<tr>
-<td>FSDP</td>
-<td>PyTorch 原生的 ZeRO-3 实现</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>DDP（DistributedDataParallel）</strong>：多进程数据并行，理解 AllReduce 梯度同步</li>
+<li><strong>FSDP</strong>：PyTorch 原生的 ZeRO-3 实现</li>
+</ul>
 <h4>模型并行（3D 并行）</h4>
-<table>
-<thead>
-<tr>
-<th>并行方式</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>张量并行（TP）</td>
-<td>将矩阵乘法沿特定维度切分到多卡，通信密集，通常限于单机</td>
-</tr>
-<tr>
-<td>流水线并行（PP）</td>
-<td>将模型不同层切分到不同机器</td>
-</tr>
-<tr>
-<td>序列并行（SP）</td>
-<td>沿序列维度切分，与 TP 配合减少激活显存</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>张量并行（TP）</strong>：将矩阵乘法沿特定维度切分到多卡，通信密集，通常限于单机</li>
+<li><strong>流水线并行（PP）</strong>：将模型不同层切分到不同机器</li>
+<li><strong>序列并行（SP）</strong>：沿序列维度切分，与 TP 配合减少激活显存</li>
+</ul>
 <h4>显存优化</h4>
 <p>ZeRO 系列（好比合租房里每人只存自己那份家具，需要时互相借用）：</p>
-<table>
-<thead>
-<tr>
-<th>阶段</th>
-<th>切分内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ZeRO-1</td>
-<td>优化器状态</td>
-</tr>
-<tr>
-<td>ZeRO-2</td>
-<td>优化器状态 + 梯度</td>
-</tr>
-<tr>
-<td>ZeRO-3</td>
-<td>优化器状态 + 梯度 + 参数（用通信换显存）</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>ZeRO-1</strong>：优化器状态</li>
+<li><strong>ZeRO-2</strong>：优化器状态 + 梯度</li>
+<li><strong>ZeRO-3</strong>：优化器状态 + 梯度 + 参数（用通信换显存）</li>
+</ul>
 <p><b>混合精度训练</b>：FP16 / BF16 / FP8 训练，减少显存占用。BF16 比 FP16 指数位更宽（8位 vs 5位），动态范围接近 FP32，不容易 overflow/underflow。</p>
 <p><b>Activation Checkpointing</b>：只保存部分激活值，需要时重新计算，用计算换显存。</p>
 <h3>4.2 推荐资料</h3>
@@ -351,125 +242,59 @@
 <tbody>
 <tr>
 <td>选型导航</td>
-<td><a href="https://docs.pytorch.org/tutorials/distributed.html" rel="noopener noreferrer">PyTorch Distributed Tutorials</a></td>
+<td><a href="https://docs.pytorch.org/tutorials/distributed.html">PyTorch Distributed Tutorials</a></td>
 <td>官方入口，按场景导向 DDP、FSDP2、Tensor Parallel 与 DeviceMesh 教程。</td>
 </tr>
 <tr>
 <td>FSDP2</td>
-<td><a href="https://docs.pytorch.org/tutorials/intermediate/FSDP_tutorial.html" rel="noopener noreferrer">Getting Started with FSDP2</a></td>
+<td><a href="https://docs.pytorch.org/tutorials/intermediate/FSDP_tutorial.html">Getting Started with FSDP2</a></td>
 <td>用 Transformer 示例讲参数分片、训练流程与预取；页面注明新代码应使用 FSDP2。</td>
 </tr>
 <tr>
 <td>ZeRO</td>
-<td><a href="https://huggingface.co/docs/transformers/deepspeed" rel="noopener noreferrer">Hugging Face Transformers：DeepSpeed ZeRO</a></td>
+<td><a href="https://huggingface.co/docs/transformers/deepspeed">Hugging Face Transformers：DeepSpeed ZeRO</a></td>
 <td>结合 Transformers 配置 ZeRO-1/2/3 与 offload，说明显存节省和通信开销的取舍。</td>
 </tr>
 <tr>
 <td>多维并行</td>
-<td><a href="https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/parallelism-guide.html" rel="noopener noreferrer">Megatron Core Parallelism Strategies Guide</a></td>
+<td><a href="https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/parallelism-guide.html">Megatron Core Parallelism Strategies Guide</a></td>
 <td>从 DP、TP、PP 开始，逐步组合 CP、EP 与 Megatron-FSDP，含选型指引和配置示例。</td>
 </tr>
 <tr>
 <td>端到端代码</td>
-<td><a href="https://github.com/pytorch/torchtitan" rel="noopener noreferrer">PyTorch TorchTitan</a></td>
+<td><a href="https://github.com/pytorch/torchtitan">PyTorch TorchTitan</a></td>
 <td>阅读真实的大模型训练实现，组合 FSDP2、TP、PP、CP、EP，并覆盖预训练与后训练；项目活跃迭代，最新功能可能要求 PyTorch nightly。</td>
 </tr>
 </tbody>
 </table>
 <h3>4.3 检验标准</h3>
-<table>
-<thead>
-<tr>
-<th>检验项目</th>
-<th>达标标准</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>显存账本</td>
-<td>拿到 7B 模型，能口算 FP16 下参数占 ~14GB、Adam 优化器状态占 ~56GB，判断单卡 80GB 能否放下完整训练状态</td>
-</tr>
-<tr>
-<td>ZeRO 拆解</td>
-<td>能一句话讲清 ZeRO-2 和 ZeRO-3 的差异（参数是否切分，通信量差异）</td>
-</tr>
-<tr>
-<td>DDP 改造</td>
-<td>拿到单卡训练脚本，30 分钟内改成 DDP 多卡版本并跑通</td>
-</tr>
-<tr>
-<td>3D 并行拓扑</td>
-<td>给 64 卡集群（8节点×8卡），能设计出 TP=8（机内）、PP=4（跨机）、DP=2 的并行方案，说明为什么 TP 不能跨机</td>
-</tr>
-</tbody>
-</table>
-<hr>
+<ul>
+<li><strong>显存账本</strong>：拿到 7B 模型，能口算 FP16 下参数占 ~14GB、Adam 优化器状态占 ~56GB，判断单卡 80GB 能否放下完整训练状态</li>
+<li><strong>ZeRO 拆解</strong>：能一句话讲清 ZeRO-2 和 ZeRO-3 的差异（参数是否切分，通信量差异）</li>
+<li><strong>DDP 改造</strong>：拿到单卡训练脚本，30 分钟内改成 DDP 多卡版本并跑通</li>
+<li><strong>3D 并行拓扑</strong>：给 64 卡集群（8节点×8卡），能设计出 TP=8（机内）、PP=4（跨机）、DP=2 的并行方案，说明为什么 TP 不能跨机</li>
+</ul>
+<hr />
 <h2>5. 第三层：推理与部署</h2>
 <p>训练是&quot;教会模型知识&quot;，推理是&quot;让模型上考场答题&quot;——最重要的是答题速度和同时服务多少考生。</p>
 <h3>5.1 LLM 推理基础</h3>
-<table>
-<thead>
-<tr>
-<th>概念或指标</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Prefill</td>
-<td>处理输入，compute-bound</td>
-</tr>
-<tr>
-<td>Decode</td>
-<td>逐 token 生成，memory-bound</td>
-</tr>
-<tr>
-<td>KV Cache</td>
-<td>自回归生成的“草稿纸”，缓存已计算的 K/V 以避免重复计算；会随序列长度线性增长显存</td>
-</tr>
-<tr>
-<td>TTFT</td>
-<td>首 token 延迟</td>
-</tr>
-<tr>
-<td>TPOT</td>
-<td>每 token 延迟</td>
-</tr>
-<tr>
-<td>吞吐量</td>
-<td>token/s</td>
-</tr>
-<tr>
-<td>P50 / P95</td>
-<td>尾延迟</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>Prefill</strong>：处理输入，compute-bound</li>
+<li><strong>Decode</strong>：逐 token 生成，memory-bound</li>
+<li><strong>KV Cache</strong>：自回归生成的“草稿纸”，缓存已计算的 K/V 以避免重复计算；会随序列长度线性增长显存</li>
+<li><strong>TTFT</strong>：首 token 延迟</li>
+<li><strong>TPOT</strong>：每 token 延迟</li>
+<li><strong>吞吐量</strong>：token/s</li>
+<li><strong>P50 / P95</strong>：尾延迟</li>
+</ul>
 <p><b>KV Cache 估算</b>：给定 LLaMA-2-7B（32层、32头、head_dim=128），上下文长度 4096，batch_size=16，FP16：</p>
 <p><code>KV ≈ 2 × 32 × 32 × 128 × 4096 × 16 × 2 B ≈ 32 GB</code></p>
 <h3>5.2 推理引擎</h3>
-<table>
-<thead>
-<tr>
-<th>核心机制</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PagedAttention</td>
-<td>vLLM 提出的虚拟内存分页思想管理 KV Cache，解决碎片化问题</td>
-</tr>
-<tr>
-<td>Continuous Batching</td>
-<td>动态组批，请求随到随处理（类似网约车拼单，随到随拼）</td>
-</tr>
-<tr>
-<td>Prefix Cache / RadixAttention</td>
-<td>复用已计算的 KV Cache，优化重复前缀场景</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>PagedAttention</strong>：vLLM 提出的虚拟内存分页思想管理 KV Cache，解决碎片化问题</li>
+<li><strong>Continuous Batching</strong>：动态组批，请求随到随处理（类似网约车拼单，随到随拼）</li>
+<li><strong>Prefix Cache / RadixAttention</strong>：复用已计算的 KV Cache，优化重复前缀场景</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -526,56 +351,19 @@
 </table>
 <h3>5.4 Speculative Decoding</h3>
 <p>好比让实习生先快速起草一段文字，再让资深主编一次性审阅：猜对的直接用，猜错的当场改，比主编逐字逐句从头写快得多。</p>
-<table>
-<thead>
-<tr>
-<th>方法</th>
-<th>核心思路</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Speculative Sampling</td>
-<td>小模型批量猜测 → 大模型一次性验证，保证分布无偏</td>
-</tr>
-<tr>
-<td>Medusa</td>
-<td>多个 Decoding Heads 并行预测多 token</td>
-</tr>
-<tr>
-<td>EAGLE-2</td>
-<td>动态 Draft Tree，更激进地产生可接受 token</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong>Speculative Sampling</strong>：小模型批量猜测 → 大模型一次性验证，保证分布无偏</li>
+<li><strong>Medusa</strong>：多个 Decoding Heads 并行预测多 token</li>
+<li><strong>EAGLE-2</strong>：动态 Draft Tree，更激进地产生可接受 token</li>
+</ul>
 <p><b>正确性保证</b>：rejection sampling 机制保证接受的 token 严格服从 target model 的分布。</p>
 <h3>5.5 性能分析工具</h3>
-<table>
-<thead>
-<tr>
-<th>工具</th>
-<th>用途</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>torch.profiler</code></td>
-<td>PyTorch 官方 profiler，定位算子与 shape</td>
-</tr>
-<tr>
-<td>Nsight Systems</td>
-<td>CPU-GPU 交互全链路分析，找到“哪里慢”</td>
-</tr>
-<tr>
-<td>Nsight Compute</td>
-<td>Kernel 级分析，找到“为什么慢”</td>
-</tr>
-<tr>
-<td>AIPerf</td>
-<td>NVIDIA 当前用于生成式模型基准测试的工具，可测 TTFT、ITL、吞吐与请求负载；官方已建议新测试改用 AIPerf，GenAI-Perf 不再新增功能</td>
-</tr>
-</tbody>
-</table>
+<ul>
+<li><strong><code>torch.profiler</code></strong>：PyTorch 官方 profiler，定位算子与 shape</li>
+<li><strong>Nsight Systems</strong>：CPU-GPU 交互全链路分析，找到“哪里慢”</li>
+<li><strong>Nsight Compute</strong>：Kernel 级分析，找到“为什么慢”</li>
+<li><strong>AIPerf</strong>：NVIDIA 当前用于生成式模型基准测试的工具，可测 TTFT、ITL、吞吐与请求负载；官方已建议新测试改用 AIPerf，GenAI-Perf 不再新增功能</li>
+</ul>
 <h3>5.6 推荐资料</h3>
 <table>
 <thead>
@@ -588,38 +376,38 @@
 <tbody>
 <tr>
 <td>推理入门</td>
-<td><a href="https://docs.vllm.ai/en/stable/getting_started/quickstart/" rel="noopener noreferrer">vLLM Quickstart</a></td>
+<td><a href="https://docs.vllm.ai/en/stable/getting_started/quickstart/">vLLM Quickstart</a></td>
 <td>从离线批量推理到兼容 OpenAI API 的在线服务，含安装与首个请求。</td>
 </tr>
 <tr>
 <td>服务框架</td>
-<td><a href="https://docs.sglang.io/" rel="noopener noreferrer">SGLang 官方文档与 Cookbook</a></td>
+<td><a href="https://docs.sglang.io/">SGLang 官方文档与 Cookbook</a></td>
 <td>从 Quickstart 入手，再按具体模型和硬件查部署配方。</td>
 </tr>
 <tr>
 <td>Speculative Decoding</td>
-<td><a href="https://docs.vllm.ai/en/stable/features/speculative_decoding/" rel="noopener noreferrer">vLLM Speculative Decoding</a></td>
+<td><a href="https://docs.vllm.ai/en/stable/features/speculative_decoding/">vLLM Speculative Decoding</a></td>
 <td>覆盖 EAGLE、MTP、draft model、n-gram 等方法，并说明性能收益受 QPS、模型、硬件和采样设置影响。</td>
 </tr>
 <tr>
 <td>量化部署</td>
-<td><a href="https://docs.vllm.ai/en/stable/features/quantization/" rel="noopener noreferrer">vLLM Quantization</a></td>
+<td><a href="https://docs.vllm.ai/en/stable/features/quantization/">vLLM Quantization</a></td>
 <td>查当前支持的量化格式与硬件兼容性；部署前按目标 GPU 和模型复核。</td>
 </tr>
 <tr>
 <td>NVIDIA 推理栈</td>
-<td><a href="https://nvidia.github.io/TensorRT-LLM/quick-start-guide.html" rel="noopener noreferrer">TensorRT-LLM Quick Start</a> · <a href="https://nvidia.github.io/TensorRT-LLM/latest/features/quantization.html" rel="noopener noreferrer">Quantization Guide</a></td>
+<td><a href="https://nvidia.github.io/TensorRT-LLM/quick-start-guide.html">TensorRT-LLM Quick Start</a> · <a href="https://nvidia.github.io/TensorRT-LLM/latest/features/quantization.html">Quantization Guide</a></td>
 <td>NVIDIA GPU 上的 LLM 服务入门与 FP8/FP4/INT4 量化路径。</td>
 </tr>
 <tr>
 <td>性能基准</td>
-<td><a href="https://docs.nvidia.com/aiperf/getting-started/profiling-with-ai-perf" rel="noopener noreferrer">AIPerf：Profiling with AIPerf（v0.13）</a></td>
+<td><a href="https://docs.nvidia.com/aiperf/getting-started/profiling-with-ai-perf">AIPerf：Profiling with AIPerf（v0.13）</a></td>
 <td>对运行中的服务施加负载并测量 TTFT、ITL、token throughput；可按请求并发或请求率组织测试。</td>
 </tr>
 </tbody>
 </table>
-<hr>
-<h2>6. 新人破局指南</h2>
+<hr />
+<h2>6. 学习建议</h2>
 <h3>6.1 推荐学习路径</h3>
 <h4>基础阶段（0-3个月）</h4>
 <ol>
@@ -679,25 +467,60 @@
 </tr>
 </tbody>
 </table>
-<hr>
-<h2>7. 核心参考论文</h2>
+<hr />
+<h2>7. 推荐资源</h2>
+<h3>7.1 核心参考论文</h3>
 <ol>
-<li><b>Attention Is All You Need</b>：<a href="https://arxiv.org/abs/1706.03762" rel="noopener noreferrer"><b>arxiv.org/abs/1706.03762</b></a></li>
-<li><b>Megatron-LM</b>：<a href="https://arxiv.org/abs/1909.08053" rel="noopener noreferrer"><b>arxiv.org/abs/1909.08053</b></a></li>
-<li><b>ZeRO</b>：<a href="https://arxiv.org/abs/1910.02054" rel="noopener noreferrer"><b>arxiv.org/abs/1910.02054</b></a></li>
-<li><b>DeepSeekMoE</b>：<a href="https://arxiv.org/abs/2401.06066" rel="noopener noreferrer"><b>arxiv.org/abs/2401.06066</b></a></li>
-<li><b>DeepSeek-V2</b>：<a href="https://arxiv.org/abs/2405.04434" rel="noopener noreferrer"><b>arxiv.org/abs/2405.04434</b></a></li>
-<li><b>FlashAttention V2</b>：<a href="https://arxiv.org/abs/2307.08691" rel="noopener noreferrer"><b>arxiv.org/abs/2307.08691</b></a></li>
-<li><b>vLLM / PagedAttention</b>：<a href="https://arxiv.org/abs/2309.06180" rel="noopener noreferrer"><b>arxiv.org/abs/2309.06180</b></a></li>
-<li><b>SGLang</b>：<a href="https://arxiv.org/abs/2312.07104" rel="noopener noreferrer"><b>arxiv.org/abs/2312.07104</b></a></li>
-<li><b>SmoothQuant</b>：<a href="https://arxiv.org/abs/2211.10438" rel="noopener noreferrer"><b>arxiv.org/abs/2211.10438</b></a></li>
-<li><b>AWQ</b>：<a href="https://arxiv.org/abs/2306.00978" rel="noopener noreferrer"><b>arxiv.org/abs/2306.00978</b></a></li>
-<li><b>DistServe</b>：<a href="https://arxiv.org/abs/2401.09670" rel="noopener noreferrer"><b>arxiv.org/abs/2401.09670</b></a></li>
+<li><b>Attention Is All You Need</b>：<a href="https://arxiv.org/abs/1706.03762"><b>arxiv.org/abs/1706.03762</b></a></li>
+<li><b>Megatron-LM</b>：<a href="https://arxiv.org/abs/1909.08053"><b>arxiv.org/abs/1909.08053</b></a></li>
+<li><b>ZeRO</b>：<a href="https://arxiv.org/abs/1910.02054"><b>arxiv.org/abs/1910.02054</b></a></li>
+<li><b>DeepSeekMoE</b>：<a href="https://arxiv.org/abs/2401.06066"><b>arxiv.org/abs/2401.06066</b></a></li>
+<li><b>DeepSeek-V2</b>：<a href="https://arxiv.org/abs/2405.04434"><b>arxiv.org/abs/2405.04434</b></a></li>
+<li><b>FlashAttention V2</b>：<a href="https://arxiv.org/abs/2307.08691"><b>arxiv.org/abs/2307.08691</b></a></li>
+<li><b>vLLM / PagedAttention</b>：<a href="https://arxiv.org/abs/2309.06180"><b>arxiv.org/abs/2309.06180</b></a></li>
+<li><b>SGLang</b>：<a href="https://arxiv.org/abs/2312.07104"><b>arxiv.org/abs/2312.07104</b></a></li>
+<li><b>SmoothQuant</b>：<a href="https://arxiv.org/abs/2211.10438"><b>arxiv.org/abs/2211.10438</b></a></li>
+<li><b>AWQ</b>：<a href="https://arxiv.org/abs/2306.00978"><b>arxiv.org/abs/2306.00978</b></a></li>
+<li><b>DistServe</b>：<a href="https://arxiv.org/abs/2401.09670"><b>arxiv.org/abs/2401.09670</b></a></li>
 </ol>
-<hr>
+<h3>7.2 优质开源课程</h3>
+<p>CMU 11-868 和 Stanford CS336 作为主线课程；CMU 10-414/714 和 Stanford CS149 用来补充框架实现与并行计算基础。公开资源的形式不同：讲义、作业代码和录像分别核对，不将课程主页公开等同于所有材料完整开放。</p>
+<table>
+<thead>
+<tr>
+<th>课程</th>
+<th>内容与作业</th>
+<th>公开资料</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CMU 11-868 · Large Language Model Systems</td>
+<td>课程内容包括 GPU 编程、Transformer 加速、分布式训练、MoE、ZeRO、量化和推理服务。作业涉及 CUDA、MiniTorch、Transformer、分布式训练与 RLHF。</td>
+<td><a href="https://llmsystem.github.io/llmsystem2026fall/">2026 秋季课程与讲义</a> · <a href="https://llmsystem.github.io/llmsystemhomework/">编程作业</a>；秋季学期仍在进行，后续材料逐步发布，未确认完整公开录像。</td>
+</tr>
+<tr>
+<td>Stanford CS336 · Language Modeling from Scratch</td>
+<td>从 tokenizer、Transformer 和优化器的实现开始，再学习系统优化、数据处理与后训练。Systems 作业包括性能分析、Triton FlashAttention 2 和分布式训练。</td>
+<td><a href="https://cs336.stanford.edu/">2026 春季课程、录像入口与五组作业</a>；先完成 Basics，再做 Systems，随后按方向进入 Scaling、Data 与 Alignment。</td>
+</tr>
+<tr>
+<td>CMU 10-414/714 · Deep Learning Systems: Algorithms and Implementation</td>
+<td>从头实现 Needle 深度学习框架，理解 Tensor、自动微分、算子、模块和优化器；HW3 实现 CPU/CUDA 的 NDArray 后端，适合补框架与底层实现基础。</td>
+<td><a href="https://dlsyscourse.org/">课程主页</a> · <a href="https://dlsyscourse.org/lectures/">讲义与录像</a> · <a href="https://dlsyscourse.org/assignments/">HW0–HW4</a>；网站已更新到 2026 秋季，公开配套录像主要为 2022 版。</td>
+</tr>
+<tr>
+<td>Stanford CS149 · Parallel Computing</td>
+<td>理解并行架构、SIMD、多线程、GPU/CUDA、访存局部性、任务调度及性能权衡；通过 CPU 并行和 CUDA 编程作业建立性能分析基础。</td>
+<td><a href="https://cs149.stanford.edu/">课程主页与编程作业</a>；官网当前指向 2025 秋季，该年录像不公开，页面提供 2023 版公开录像入口。</td>
+</tr>
+</tbody>
+</table>
+<p>已有 PyTorch 和系统基础时，以 CMU 11-868 建立全景，以 CS336 的 Basics 与 Systems 作业形成可检查的工程成果；对框架内部机制不熟，先补 CMU 10-414/714；对并行执行、访存和性能瓶颈不熟，先补 CS149 的相关章节。</p>
+<hr />
 <h2>关于我</h2>
 <p>大家好，我是 Sylan，目前在一家 B 端独角兽公司负责桌面办公 Agent 项目。</p>
-<p>个人博客：<a href="https://ningsiyuan1024.github.io/" rel="noopener noreferrer">Sylan</a> · GitHub：<a href="https://github.com/ningsiyuan1024" rel="noopener noreferrer">ningsiyuan1024</a> · X：<a href="https://x.com/syunnng2" rel="noopener noreferrer">@syunnng2</a> · 公众号：SylanOvO</p>
+<p>个人博客：<a href="https://ningsiyuan1024.github.io/">Sylan</a> · GitHub：<a href="https://github.com/ningsiyuan1024">ningsiyuan1024</a> · X：<a href="https://x.com/syunnng2">@syunnng2</a> · 公众号：SylanOvO</p>
 <h2>Coffee chat 与合作</h2>
 <p>如果你也关注 AI 的技术、产品、创意或业务实践，欢迎加我微信：NINGSiyuan1024。我们可以交换一线观察、方法与资源，也可以一起探索合作的可能。</p>
 <p>如果你在北京，也欢迎约我线下 coffee chat。</p>
