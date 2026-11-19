@@ -19,7 +19,9 @@ def verify():
     if not articles: raise ValueError('Cannot deploy an empty blog')
     for file in articles:
         p=json.loads(file.read_text(encoding='utf-8')); raw=(file.parent/'body.html').read_text(encoding='utf-8').encode('utf-8')
-        assert p['status']=='published_verified' and p['text_preserved']
+        assert p['status'] in {'published_verified', 'blog_original'} and p['text_preserved']
+        if p['status'] == 'blog_original':
+            assert p['source_url'] == f"https://ningsiyuan1024.github.io/articles/{p['slug']}/", file
         assert hashlib.sha256(raw).hexdigest()==p['body_sha256'], file
         assert (OUT/'articles'/p['slug']/'index.html').is_file(), file
     checked=0

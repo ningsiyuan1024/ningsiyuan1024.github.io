@@ -39,8 +39,12 @@ def shell(title, body, path='/', description=None, article=None):
     person = {'@type':'Person','@id':BASE+'/#author','name':'Sylan','url':BASE+'/', 'sameAs':['https://x.com/syunnng2','https://github.com/ningsiyuan1024',CONFIG['linktree']]}
     structured = {'@context':'https://schema.org', '@type':'Blog', '@id':BASE+'/#blog', 'name':'Sylan', 'url':BASE,'inLanguage':'zh-CN','author':person}
     if article:
+        original = article['status'] == 'blog_original'
         citations = list(dict.fromkeys([article['source_url']]+article.get('alternate_sources',[])+METRICS.get('additional_sources',{}).get(article['slug'],[])))
         structured.update({'@type':'BlogPosting','@id':BASE+path+'#article','url':BASE+path, 'headline':article['title'], 'description':description,'datePublished':article['published_at'], 'mainEntityOfPage':BASE+path, 'isBasedOn':article['source_url'],'citation':citations,'isPartOf':{'@id':BASE+'/#blog'},'image':BASE+(article.get('cover') or '/assets/avatar.png')})
+        if original:
+            structured.pop('isBasedOn', None)
+            structured.pop('citation', None)
     structured_json = json.dumps(structured,ensure_ascii=False).replace('<','\\u003c')
     social_image = BASE + (article.get('cover') or '/assets/avatar.png') if article else BASE + '/assets/avatar.png'
     text_alternate = f'<link rel="alternate" type="text/plain" href="{path}index.txt">' if path.endswith('/') else ''
@@ -68,7 +72,7 @@ def article_extras(post):
     urls = list(dict.fromkeys([post['source_url']] + post.get('alternate_sources',[]) +
                             METRICS.get('additional_sources',{}).get(post['slug'],[])))
     rows = []
-    for url in urls:
+    for url in ([] if post['status'] == 'blog_original' else urls):
         entry = METRICS['sources'].get(url,{})
         platform = entry.get('platform') or ('微信公众号' if 'mp.weixin.qq.com/' in url else
                     'X' if 'x.com/' in url else '知乎' if 'zhihu.com/' in url else
@@ -91,7 +95,7 @@ def article_extras(post):
     author = CONFIG['author_footer']
     directions = ''.join(f'<div><h3>{E(item["title"])}</h3><p>{E(item["text"])}</p></div>' for item in author['directions'])
     bio = f'''<aside class="author-note" aria-label="关于 Sylan"><div class="author-note-head"><img src="/assets/avatar.png" width="40" height="40" alt=""><div><h2>Sylan</h2><p>{E(author['intro'])}</p></div></div><div class="author-directions">{directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></aside>'''
-    return stats + bio
+    return (stats if rows else '') + bio
 
 def build():
     # Only remove generated output inside this project.
@@ -102,7 +106,7 @@ def build():
     posts = []
     for path in sorted((ROOT / 'content').glob('*/article.json')):
         p = json.loads(path.read_text(encoding='utf-8'))
-        if p.get('status') != 'published_verified': raise ValueError(f'Unverified content: {path}')
+        if p.get('status') not in {'published_verified', 'blog_original'}: raise ValueError(f'Unverified content: {path}')
         if not re.fullmatch(r'[a-z0-9][a-z0-9-]*', p['slug']): raise ValueError('Invalid slug')
         p['html'] = (path.parent / 'body.html').read_text(encoding='utf-8')
         p['text'] = plain(p['html'])
@@ -128,18 +132,24 @@ def build():
         cover = f'<img src="{E(p["cover"],quote=True)}" alt="" loading="lazy">' if p.get('cover') else '<div class="cover-type" aria-hidden="true">S<span>.</span></div>'
         labels = ''.join(f'<span class="topic">{E(c)}</span>' for c in p['categories'])
         cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}"><a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true">{cover}</a><div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
-        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span>{labels}<a href="{E(p['source_url'],quote=True)}">原平台：{E(p.get('platform','原平台'))} ↗</a></div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div>{article_extras(p)}<div class="article-end"><a href="{E(p['source_url'],quote=True)}">阅读原平台版本 ↗</a><a href="/">返回文章列表 →</a></div></main>'''
+        original = p['status'] == 'blog_original'
+        source_link = '<span>博客首发</span>' if original else f'<a href="{E(p["source_url"],quote=True)}">原平台：{E(p.get("platform","原平台"))} ↗</a>'
+        source_end = '' if original else f'<a href="{E(p["source_url"],quote=True)}">阅读原平台版本 ↗</a>'
+        text_source = '来源：博客首发' if original else f'原平台：{p["source_url"]}'
+        content = f'''<main id="main" class="article-page"><a class="back" href="/">← 所有文章</a><header class="article-header" id="top"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')}</time><span>{p['minutes']} 分钟</span>{labels}{source_link}</div><h1>{E(p['title'])}</h1><div class="byline"><img src="/assets/avatar.png" width="28" height="28" alt="">Sylan</div></header><div class="prose">{p['html']}</div>{article_extras(p)}<div class="article-end">{source_end}<a href="/">返回文章列表 →</a></div></main>'''
         write('articles/'+p['slug']+'/index.html',shell(p['title'],content,p['path'],p['description'],p))
         readable=ReadableText();readable.feed(p['html'])
         text_body=re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+','\n\n',''.join(readable.parts)).strip()
-        write('articles/'+p['slug']+'/index.txt',f"{p['title']}\n\n作者：Sylan\n原发表日期：{p['published_at']}\n博客地址：{BASE}{p['path']}\n原平台：{p['source_url']}\n\n{text_body}\n")
+        write('articles/'+p['slug']+'/index.txt',f"{p['title']}\n\n作者：Sylan\n原发表日期：{p['published_at']}\n博客地址：{BASE}{p['path']}\n{text_source}\n\n{text_body}\n")
     author = CONFIG['author_footer']
     home_directions = ''.join(f'<div><h2>{E(item["title"])}</h2><p>{E(item["text"])}</p></div>' for item in author['directions'])
     about = f'''<section class="home-about" aria-label="作者介绍"><div class="author-directions">{home_directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></section>'''
     topic_options = ''.join(f'<option value="{E(c,quote=True)}">{E(c)}</option>' for c in categories)
     body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
     write('index.html',shell('个人博客',body))
-    listing='\n'.join(f"- [{p['title']}]({BASE}{p['path']}): {p['published_at']} · 原平台 {p['source_url']} · [全文文本]({BASE}{p['path']}index.txt)" for p in posts)
+    def listing_source(post):
+        return '博客首发' if post['status']=='blog_original' else '原平台 '+post['source_url']
+    listing='\n'.join(f"- [{p['title']}]({BASE}{p['path']}): {p['published_at']} · {listing_source(p)} · [全文文本]({BASE}{p['path']}index.txt)" for p in posts)
     author_text = author['intro']+'\n\n'+'\n\n'.join(item['title']+'\n'+item['text'] for item in author['directions'])+'\n\n微信：'+author['wechat']
     write('index.txt',f'Sylan\n\n{CONFIG["description"]}\n\n{author_text}\n\n{listing}\n')
     write('llms.txt',f'# Sylan\n\n> Sylan 已公开发表文章的个人博客。\n\n## 作者与来源\n\n- [X](https://x.com/syunnng2)\n- [GitHub](https://github.com/ningsiyuan1024)\n- [Linktree]({CONFIG["linktree"]})\n\n文章保留原发表日期与原平台来源。译文、节选和引用的原始作者信息见各篇正文。\n\n## 文章\n\n{listing}\n\n## 订阅与目录\n\n- [RSS]({BASE}/feed.xml)\n- [站点地图]({BASE}/sitemap.xml)\n')
