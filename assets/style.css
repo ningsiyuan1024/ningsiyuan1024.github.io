@@ -5,3 +5,5 @@
 .intro{padding:52px 0 30px}.intro-bio{font-size:15px;line-height:1.8;margin:24px 0 0;color:var(--muted)}.home-about{padding-bottom:34px}.home-about .author-directions{margin-top:0;gap:32px}.home-about h2{font-size:13px;font-weight:500;line-height:1.6;margin:0 0 10px}.home-about p{font-size:13px;color:var(--muted);line-height:1.9;margin:0}.home-about .author-contact{margin-top:22px}@media(max-width:700px){.intro{padding:36px 0 26px}.intro-bio{font-size:13px;margin-top:20px}.home-about .author-directions{gap:20px}.home-about .author-directions>div{grid-template-columns:1fr;gap:0}.home-about h2{margin-bottom:6px}.home-about{padding-bottom:28px}}
 
 .entry-image[href="/articles/ai-infra-learning-route/"] img{object-position:right center}
+
+.home-featured{border-top:1px solid var(--line);padding:25px 0 30px}.home-featured .eyebrow{margin:0 0 10px;color:var(--accent)}.home-featured h2{font-family:Georgia,"Songti SC",SimSun,serif;font-weight:500;font-size:clamp(19px,2.5vw,26px);line-height:1.55;margin:0;overflow-wrap:anywhere}.home-featured h2 span{color:var(--accent)}

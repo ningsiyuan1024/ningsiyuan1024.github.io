@@ -10,5 +10,8 @@
   "body_sha256": "b1916de3e729e62696cd1c64bb2fb4d585ce57fd3c5951c245962a8d63fe40a8",
   "text_preserved": true,
   "asset_count": 2,
-  "warnings": []
+  "warnings": [],
+  "categories": [
+    "阅读笔记"
+  ]
 }
