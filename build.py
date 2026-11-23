@@ -95,7 +95,19 @@ def article_extras(post):
     author = CONFIG['author_footer']
     directions = ''.join(f'<div><h3>{E(item["title"])}</h3><p>{E(item["text"])}</p></div>' for item in author['directions'])
     bio = f'''<aside class="author-note" aria-label="关于 Sylan"><div class="author-note-head"><img src="/assets/avatar.png" width="40" height="40" alt=""><div><h2>Sylan</h2><p>{E(author['intro'])}</p></div></div><div class="author-directions">{directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></aside>'''
-    return (stats if rows else '') + bio
+    newsletter = '''<section class="email-subscription" id="sylan-email-subscription" aria-labelledby="subscription-title">
+<h2 id="subscription-title">订阅 Sylan 的博客</h2>
+<p>有新文章时，用邮件收到摘要和原文链接。</p>
+<form method="post" action="https://api.follow.it/subscribe" aria-labelledby="subscription-title">
+  <label for="subscription-email">邮箱地址</label>
+  <div class="subscribe-fields">
+    <input id="subscription-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required aria-describedby="subscription-provider">
+    <button type="submit">邮件订阅</button>
+  </div>
+</form>
+<small id="subscription-provider">邮件由 follow.it 发送，可在邮件中退订。</small>
+</section>'''
+    return newsletter + (stats if rows else '') + bio
 
 def build():
     # Only remove generated output inside this project.
