@@ -71,3 +71,24 @@
   grid-column: 1 / -1;
   max-inline-size: 44rem;
 }
+
+/* Quiet document layout shared by the home and reading views. */
+:root { --paper: #fffefa; --ink: #37352f; --muted: #686762; --line: #e7e5df; --accent: #514499; }
+main, .article-page, .masthead, .footer { width: min(100%, calc(42rem + 40px)); padding-inline: 20px; }
+.masthead { padding-block: 16px; }
+.brand { font: 650 18px/1.4 system-ui, sans-serif; letter-spacing: normal; }
+.intro { padding-block: 48px 26px; }
+.intro h1, .article-header h1 { font-size: 32px; letter-spacing: normal; }
+.portrait { width: 54px; height: 54px; margin: 0; }
+.home-about .author-directions > div { display: block; border: 0; padding-block: 16px; }
+.home-about .author-directions > div > h2, .entry h2, .prose h2, .prose h3 {
+  font-family: Georgia, "Songti SC", SimSun, serif;
+  font-size: 20px;
+}
+.home-about .author-directions > div > h2 { margin-bottom: 8px; }
+.home-about p, .article-page .prose { font-size: 16px; line-height: 1.8; }
+.entry { display: flex; align-items: flex-start; gap: 16px; padding-block: 20px; }
+.entry-copy { flex: 1; min-width: 0; }
+.entry h2 { margin: 0 0 4px; }
+.entry .meta { margin-bottom: 6px; }
+.entry-image { order: 1; flex: 0 0 clamp(64px, 14vw, 110px); }
