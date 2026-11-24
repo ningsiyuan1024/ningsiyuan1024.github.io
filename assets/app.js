@@ -15,3 +15,24 @@ if (search) {
   search.addEventListener('input', filter);
   category.addEventListener('change', filter);
 }
+
+for (const link of document.querySelectorAll('.entry-image')) {
+  const image = link.querySelector('img');
+  if (!image || !image.getAttribute('src')?.trim()) {
+    link.remove();
+    continue;
+  }
+
+  const finish = () => {
+    if (image.naturalWidth <= 1 || image.naturalHeight <= 1) {
+      link.remove();
+    } else {
+      link.classList.remove('cover-pending');
+    }
+  };
+
+  link.classList.add('cover-pending');
+  image.addEventListener('load', finish, { once: true });
+  image.addEventListener('error', () => link.remove(), { once: true });
+  if (image.complete) finish();
+}
