@@ -141,9 +141,11 @@ def build():
     cards = []
     categories = sorted({c for p in posts for c in p['categories']})
     for i,p in enumerate(posts):
-        cover = f'<img src="{E(p["cover"],quote=True)}" alt="" loading="lazy">' if p.get('cover') else '<div class="cover-type" aria-hidden="true">S<span>.</span></div>'
+        cover = ''
+        if p.get('cover'):
+            cover = f'''<a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true"><img src="{E(p["cover"],quote=True)}" alt="" loading="lazy"></a>'''
         labels = ''.join(f'<span class="topic">{E(c)}</span>' for c in p['categories'])
-        cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}"><a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true">{cover}</a><div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
+        cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}">{cover}<div class="entry-copy"><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><h2><a href="{p['path']}">{E(p['title'])}</a></h2><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
         original = p['status'] == 'blog_original'
         source_link = '<span>博客首发</span>' if original else f'<a href="{E(p["source_url"],quote=True)}">原平台：{E(p.get("platform","原平台"))} ↗</a>'
         source_end = '' if original else f'<a href="{E(p["source_url"],quote=True)}">阅读原平台版本 ↗</a>'
