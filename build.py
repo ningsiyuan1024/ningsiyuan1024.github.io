@@ -162,7 +162,24 @@ def build():
         if not post: raise ValueError(f'Unknown featured article: {featured_slug}')
         featured = f'''<section class="home-featured" aria-labelledby="featured-title"><p class="eyebrow">精选作品 · 源码对比</p><h2 id="featured-title"><a href="{post['path']}">{E(post['title'])} <span aria-hidden="true">↗</span></a></h2></section>'''
     topic_options = ''.join(f'<option value="{E(c,quote=True)}">{E(c)}</option>' for c in categories)
-    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}{featured}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
+    research_interests = '''<section class="prose" aria-labelledby="research-interests">
+<h2 id="research-interests">我关注的方向</h2>
+<h3>算法方向</h3>
+<ol>
+<li><strong>Harness Self‑Evolution</strong>：研究 Harness 闭环自进化机制，自主迭代工具集、执行架构与多智能体协作范式，适配模型能力与业务场景演进。</li>
+<li><strong>Context Engineering</strong>：探索复杂场景下的上下文组织与编排，在模型窗口和 token efficiency 约束下引导模型聚焦关键信息，提升 Agent 任务表现。</li>
+<li><strong>Multi‑Agent Coordination</strong>：研究大规模分布式智能体协作，构建 Agent 集群化协作能力。</li>
+<li><strong>Long‑term Memory</strong>：研究 Agent 长期记忆、经验内化与自我迭代机制，形成稳定的行为模式与长期决策准则。</li>
+<li><strong>Long‑Horizon</strong>：研究长链路、稀疏反馈任务下的持续决策机制，降低长周期执行中的能力衰减。</li>
+</ol>
+<h3>工程方向</h3>
+<ol>
+<li><strong>Harness Self‑Evolution</strong>：搭建 Agent 自进化 SDK 与平台，实现智能体自主迭代与持续能力升级。</li>
+<li><strong>Context Engineering</strong>：优化 Agent 上下文与提示工程，提升复杂场景下的适配能力与任务表现。</li>
+<li><strong>Evaluation</strong>：建设 Agent 多维度评测体系、数据集与基准，支撑 Agent 效果迭代和自进化。</li>
+</ol>
+</section>'''
+    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}我目前关注<a href="#research-interests">下一代 Agent 范式</a>的技术实现和产品化表达。</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}{featured}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section>{research_interests}</main>'''
     write('index.html',shell('个人博客',body))
     def listing_source(post):
         return '博客首发' if post['status']=='blog_original' else '原平台 '+post['source_url']
