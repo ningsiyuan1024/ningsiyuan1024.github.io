@@ -27,3 +27,42 @@
 .subscribe-fields input { flex: 1 1 190px; min-width: 0; background: transparent; color: var(--ink); }
 .subscribe-fields button { background: var(--ink); color: var(--paper); cursor: pointer; }
 .subscribe-fields button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+/* Homepage and article reading measures */
+:root { --muted: #60685f; }
+.intro-bio { max-width: 38em; font-size: 16px; }
+.intro-bio a { text-decoration: underline; text-underline-offset: .22em; }
+.home-about .author-directions { grid-template-columns: 1fr; gap: 0; }
+.home-about .author-directions > div {
+  display: grid;
+  grid-template-columns: 7em minmax(0, 40em);
+  align-items: baseline;
+  gap: 0 2em;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.home-about .author-directions > div > h2 { font-size: 17px; font-weight: 600; margin: 0; }
+.home-about p, .entry-copy > p { font-size: 15px; line-height: 1.8; }
+.home-about .prose { grid-column: 2; margin-top: 18px; font-size: 16px; line-height: 1.75; }
+.home-about .prose h2 { font-size: 18px; margin: 0; }
+.home-about .prose h3 { font-size: 15px; margin: 20px 0 8px; font-weight: 600; }
+.home-about .prose ol { margin: 0; padding-inline-start: 1.55em; }
+.home-about .prose li + li, .article-page .prose li + li { margin-top: .55em; }
+.home-about .prose li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+#research-interests { scroll-margin-top: 24px; }
+.article-page { max-width: 780px; }
+.article-page .prose { line-height: 1.85; }
+.article-page .prose p { margin-bottom: 1.05em; }
+.article-header h1, .entry h2, .home-featured h2 { text-wrap: pretty; }
+.archive-head, .archive-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.search input, .archive-tools select { font-family: inherit; font-size: 14px; }
+.footer, .footer > div { flex-wrap: wrap; gap: 14px; }
+@media (max-width: 700px) {
+  .home-about .author-directions > div { display: block; padding: 16px 0; }
+  .home-about .author-directions > div > h2 { margin-bottom: 6px; }
+  .intro { align-items: flex-start; gap: 14px; }
+  .portrait { width: 66px; height: 66px; flex: none; }
+  .intro-bio { font-size: 15px; }
+  .archive-tools { max-width: 100%; }
+  .article-page .prose { line-height: 1.8; }
+}
