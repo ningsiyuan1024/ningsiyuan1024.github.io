@@ -154,14 +154,6 @@ def build():
         text_body=re.sub(r'\n[ \t]*\n(?:[ \t]*\n)+','\n\n',''.join(readable.parts)).strip()
         write('articles/'+p['slug']+'/index.txt',f"{p['title']}\n\n作者：Sylan\n原发表日期：{p['published_at']}\n博客地址：{BASE}{p['path']}\n{text_source}\n\n{text_body}\n")
     author = CONFIG['author_footer']
-    home_directions = ''.join(f'<div><h2>{E(item["title"])}</h2><p>{E(item["text"])}</p></div>' for item in author['directions'])
-    about = f'''<section class="home-about" aria-label="作者介绍"><div class="author-directions">{home_directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></section>'''
-    featured = ''
-    if featured_slug := CONFIG.get('featured_article'):
-        post = next((p for p in posts if p['slug'] == featured_slug), None)
-        if not post: raise ValueError(f'Unknown featured article: {featured_slug}')
-        featured = f'''<section class="home-featured" aria-labelledby="featured-title"><p class="eyebrow">精选作品 · 源码对比</p><h2 id="featured-title"><a href="{post['path']}">{E(post['title'])} <span aria-hidden="true">↗</span></a></h2></section>'''
-    topic_options = ''.join(f'<option value="{E(c,quote=True)}">{E(c)}</option>' for c in categories)
     research_interests = '''<section class="prose" aria-labelledby="research-interests">
 <h2 id="research-interests">我关注的方向</h2>
 <h3>算法方向</h3>
@@ -179,7 +171,19 @@ def build():
 <li><strong>Evaluation</strong>：建设 Agent 多维度评测体系、数据集与基准，支撑 Agent 效果迭代和自进化。</li>
 </ol>
 </section>'''
-    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}我目前关注<a href="#research-interests">下一代 Agent 范式</a>的技术实现和产品化表达。</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}{featured}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section>{research_interests}</main>'''
+    home_sections = []
+    for item in author['directions']:
+        details = research_interests if item['title'] == '工作与研究' else ''
+        home_sections.append(f'<div><h2>{E(item["title"])}</h2><p>{E(item["text"])}</p>{details}</div>')
+    home_directions = ''.join(home_sections)
+    about = f'''<section class="home-about" aria-label="作者介绍"><div class="author-directions">{home_directions}</div><div class="author-contact"><span>微信：{E(author['wechat'])}</span><a href="{CONFIG['linktree']}">各平台与联系 ↗</a></div></section>'''
+    featured = ''
+    if featured_slug := CONFIG.get('featured_article'):
+        post = next((p for p in posts if p['slug'] == featured_slug), None)
+        if not post: raise ValueError(f'Unknown featured article: {featured_slug}')
+        featured = f'''<section class="home-featured" aria-labelledby="featured-title"><p class="eyebrow">精选作品 · 源码对比</p><h2 id="featured-title"><a href="{post['path']}">{E(post['title'])} <span aria-hidden="true">↗</span></a></h2></section>'''
+    topic_options = ''.join(f'<option value="{E(c,quote=True)}">{E(c)}</option>' for c in categories)
+    body = f'''<main id="main"><section class="intro" id="top"><div><p class="eyebrow">Sylan 的个人博客</p><h1>AI、Agent<br>与创造<span>。</span></h1><p class="intro-bio">{E(author['intro'])}我目前关注<a href="#research-interests">下一代 Agent 范式</a>的技术实现和产品化表达。</p></div><img class="portrait" src="/assets/avatar.png" alt="Sylan 的黑猫头像" width="152" height="152"></section>{about}{featured}<section class="archive" aria-labelledby="archive-title"><div class="archive-head"><h2 id="archive-title">文章 <span>{len(posts):02d}</span></h2><div class="archive-tools"><label><span class="sr-only">按主题筛选</span><select id="category"><option value="">全部主题</option>{topic_options}</select></label><label class="search"><span class="sr-only">搜索文章</span><input id="search" type="search" placeholder="搜索文章" autocomplete="off"><span aria-hidden="true">⌕</span></label></div></div><div id="articles">{''.join(cards)}</div><p id="no-results" hidden role="status">没有找到相关文章。</p></section></main>'''
     write('index.html',shell('个人博客',body))
     def listing_source(post):
         return '博客首发' if post['status']=='blog_original' else '原平台 '+post['source_url']
