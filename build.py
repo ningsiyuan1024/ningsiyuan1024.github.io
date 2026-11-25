@@ -60,7 +60,7 @@ def shell(title, body, path='/', description=None, article=None):
 <style>.archive-tools{{display:flex;align-items:center;gap:16px}}.archive-tools select{{background:transparent;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:6px 8px;font:12px inherit}}.topic{{color:var(--accent)}}@media(max-width:700px){{.archive-tools{{gap:5px}}.archive-tools select{{max-width:108px}}}}</style>
 <script type="application/ld+json">{structured_json}</script></head>
 <body><a class="skip" href="#main">跳到正文</a><header class="masthead"><a class="brand" href="/">Sylan<span>.</span></a>
-<nav aria-label="主导航"><a href="/">文章</a><a href="{CONFIG['linktree']}">Linktree ↗</a><a href="/feed.xml">RSS</a></nav></header>
+<nav aria-label="主导航"><a href="/#archive-title">文章</a><a href="{CONFIG['linktree']}">Linktree ↗</a><a href="/feed.xml">RSS</a></nav></header>
 {body}<footer class="footer"><a href="/">Sylan</a><div><a href="https://github.com/ningsiyuan1024">GitHub ↗</a><a href="{CONFIG['linktree']}">各平台主页 ↗</a></div><a href="#top" aria-label="回到顶部">↑</a></footer>
 <script src="/assets/app.js" defer></script></body></html>'''
 
@@ -145,7 +145,7 @@ def build():
         if p.get('cover'):
             cover = f'''<a class="entry-image" href="{p['path']}" tabindex="-1" aria-hidden="true"><img src="{E(p["cover"],quote=True)}" alt="" loading="lazy"></a>'''
         labels = ''.join(f'<span class="topic">{E(c)}</span>' for c in p['categories'])
-        cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}">{cover}<div class="entry-copy"><h2><a href="{p['path']}">{E(p['title'])}</a></h2><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><p>{E(p['description'])}…</p><a class="read" href="{p['path']}" aria-label="阅读：{E(p['title'],quote=True)}">阅读全文 <span>↗</span></a></div></article>''')
+        cards.append(f'''<article class="entry" data-categories="{E('|'.join(p['categories']),quote=True)}" data-search="{E(p['title']+' '+p['text'],quote=True)}">{cover}<div class="entry-copy"><h2><a href="{p['path']}">{E(p['title'])}</a></h2><div class="meta"><time datetime="{p['published_at']}">{p['published_at'][:10].replace('-','.')} </time><span>{p['minutes']} 分钟</span>{labels}</div><p>{E(p['description'])}…</p></div></article>''')
         original = p['status'] == 'blog_original'
         source_link = '<span>博客首发</span>' if original else f'<a href="{E(p["source_url"],quote=True)}">原平台：{E(p.get("platform","原平台"))} ↗</a>'
         source_end = '' if original else f'<a href="{E(p["source_url"],quote=True)}">阅读原平台版本 ↗</a>'
